@@ -2,45 +2,35 @@ import {
   Button,
   Flex,
   Input,
+  Spinner,
   Text,
   useClipboard,
   useMediaQuery,
 } from "@chakra-ui/react";
-import { ButtonComponent } from "./ButtonComponent";
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import { ConnectWallet } from "./ConnectWallet";
+import { getUserInfo } from "../utils/functions/getUserInfo";
+import { User } from "../utils/types/userType";
 
 export const AffiliateComponent = () => {
   const [isMobile] = useMediaQuery("(max-width: 1200px)");
   const [walletAddress, setWalletAddress] = useState("");
-  const { hasCopied, onCopy } = useClipboard(
-    `https://youtube.com/ref/${walletAddress}`
+  const [userInfo, setUserInfo] = useState<User | null>(null);
+  const { onCopy } = useClipboard(
+    `${process.env.NEXT_PUBLIC_APP_URL}/ref/${userInfo?.address}`
   );
-
-  const connectWallet = async () => {
-    try {
-      const { solana } = window as any;
-      if (solana) {
-        if (solana.isPhantom) {
-          console.log("phantom wallet found");
-          const response = await solana.connect({ onlyIfTrusted: false });
-          console.log("public key", response.publicKey.toString());
-          setWalletAddress(response.publicKey.toString());
-          await localStorage.setItem("wallet", response.publicKey.toString());
-        } else {
-          alert("Please install phantom wallet");
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setWalletAddress(localStorage.getItem("wallet") || "");
+      setWalletAddress(localStorage.getItem("wallet_address") || "");
     }
   }, []);
+
+  useEffect(() => {
+    if (walletAddress) {
+      getUserInfo(walletAddress, setUserInfo);
+    }
+  }, [walletAddress]);
 
   return (
     <Flex
@@ -48,7 +38,6 @@ export const AffiliateComponent = () => {
       mt={isMobile ? 5 : 100}
       bgColor="#fff"
       width={isMobile ? "95%" : "50%"}
-      //   h={500}
       borderRadius={20}
       p={isMobile ? 5 : 20}
       alignItems="center"
@@ -67,27 +56,10 @@ export const AffiliateComponent = () => {
         </span>
       </Text>
 
-      {walletAddress ? (
-        <Flex flexDir="column" w="100%" alignItems="center">
-          <Flex
-            px={3}
-            flexDir="row"
-            borderColor={"green"}
-            borderWidth={2}
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Image
-              src={require("../assets/wallet-logo.png")}
-              alt="phantom-wallet"
-              style={{ width: 75 }}
-            />
-            <Text mr={3} fontWeight={"600"}>{`${walletAddress.substring(
-              0,
-              4
-            )}...${walletAddress.substring(walletAddress.length - 4)}`}</Text>
-          </Flex>
+      <ConnectWallet />
 
+      {userInfo ? (
+        <Flex flexDir="column" w="100%" alignItems="center" mt={5}>
           <Flex
             mt={5}
             width={isMobile ? "100%" : "60%"}
@@ -99,7 +71,7 @@ export const AffiliateComponent = () => {
             <Input
               borderColor="black"
               borderWidth={1}
-              value={`https://youtube.com/ref/${walletAddress}`}
+              value={`${process.env.NEXT_PUBLIC_APP_URL}/ref/${userInfo?.address}`}
               isReadOnly
               placeholder="Enter affiliate link"
             />
@@ -125,7 +97,7 @@ export const AffiliateComponent = () => {
                 Invited users
               </Text>
               <Text fontSize={isMobile ? 19 : 23} fontWeight="bold">
-                20
+                {userInfo.invited}
               </Text>
             </Flex>
 
@@ -134,17 +106,13 @@ export const AffiliateComponent = () => {
                 Generated tokens
               </Text>
               <Text fontSize={isMobile ? 19 : 23} fontWeight="bold">
-                10,000 $DINO
+                {userInfo.tokens} $DINO
               </Text>
             </Flex>
           </Flex>
         </Flex>
       ) : (
-        <ButtonComponent
-          text="Connect Wallet"
-          inverseColor
-          onClick={connectWallet}
-        />
+        <Spinner mt={10} size="xl" />
       )}
     </Flex>
   );

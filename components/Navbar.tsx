@@ -12,22 +12,24 @@ import {
 import Image from "next/image";
 import { ButtonComponent } from "./ButtonComponent";
 import { HamburgerIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/router";
 
 export const Navbar = () => {
   const [isMobile] = useMediaQuery("(max-width: 1200px)");
+  const router = useRouter();
 
   const navItems = [
     {
       name: "Roadmap",
-      route: "/buy",
+      route: "/",
     },
     {
       name: "Tokenomics",
-      route: "/token",
+      route: "/",
     },
     {
       name: "Affiliate Program",
-      route: "/affiliate",
+      route: "/",
       selected: true,
     },
   ];
@@ -41,7 +43,10 @@ export const Navbar = () => {
       <Image
         src={require("../assets/dino-logo.png")}
         alt="logo"
-        style={{ width: 100 }}
+        style={{ width: 100, cursor: "pointer" }}
+        onClick={() => {
+          router.push("/");
+        }}
       />
 
       {isMobile ? (
