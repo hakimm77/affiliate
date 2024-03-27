@@ -4,7 +4,8 @@ import { User } from "../types/userType";
 
 export const getUserInfo = async (
   walletAddress: string,
-  setUserInfo: Dispatch<React.SetStateAction<null | User>>
+  setUserInfo: Dispatch<React.SetStateAction<null | User>>,
+  setLoading: Dispatch<React.SetStateAction<boolean>>
 ) => {
   await axios
     .post(`${process.env.NEXT_PUBLIC_APP_URL}/api/addUser` as string, {
@@ -12,9 +13,11 @@ export const getUserInfo = async (
     })
     .then((res) => {
       setUserInfo(res.data);
+      setLoading(false);
     })
     .catch((err) => {
       console.log(err);
       alert("Something went wrong, Try again");
+      setLoading(false);
     });
 };

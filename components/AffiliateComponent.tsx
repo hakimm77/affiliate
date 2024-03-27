@@ -15,6 +15,7 @@ import { User } from "../utils/types/userType";
 export const AffiliateComponent = () => {
   const [isMobile] = useMediaQuery("(max-width: 1200px)");
   const [walletAddress, setWalletAddress] = useState("");
+  const [isLoading, setLoading] = useState(false);
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const { onCopy } = useClipboard(
     `${process.env.NEXT_PUBLIC_APP_URL}/ref/${userInfo?.address}`
@@ -28,7 +29,8 @@ export const AffiliateComponent = () => {
 
   useEffect(() => {
     if (walletAddress) {
-      getUserInfo(walletAddress, setUserInfo);
+      setLoading(true);
+      getUserInfo(walletAddress, setUserInfo, setLoading);
     }
   }, [walletAddress]);
 
@@ -58,7 +60,7 @@ export const AffiliateComponent = () => {
 
       <ConnectWallet />
 
-      {userInfo ? (
+      {userInfo && (
         <Flex flexDir="column" w="100%" alignItems="center" mt={5}>
           <Flex
             mt={5}
@@ -111,9 +113,9 @@ export const AffiliateComponent = () => {
             </Flex>
           </Flex>
         </Flex>
-      ) : (
-        <Spinner mt={10} size="xl" />
       )}
+
+      {isLoading && <Spinner mt={10} size="xl" />}
     </Flex>
   );
 };
