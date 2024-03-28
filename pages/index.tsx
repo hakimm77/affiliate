@@ -8,7 +8,7 @@ const Home: NextPage = () => {
   return (
     <Flex flexDir="column" alignItems="center">
       <Head>
-        <title>$DINO Affiliate</title>
+        <title>DINO Affiliate</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link

@@ -1,6 +1,7 @@
 import { Flex, Text, useMediaQuery } from "@chakra-ui/react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import dynamic from "next/dynamic";
+import { disconnect } from "process";
 import { useEffect } from "react";
 
 const WalletDisconnectButtonDynamic = dynamic(
@@ -16,7 +17,7 @@ const WalletMultiButtonDynamic = dynamic(
 
 export const ConnectWallet = () => {
   const [isMobile] = useMediaQuery("(max-width: 1200px)");
-  const { publicKey } = useWallet();
+  const { publicKey, disconnecting, disconnect, connect } = useWallet();
 
   useEffect(() => {
     if (publicKey && typeof window !== "undefined") {
@@ -27,6 +28,13 @@ export const ConnectWallet = () => {
   return (
     <Flex flexDir={isMobile ? "column" : "row"} alignItems="center">
       <WalletMultiButtonDynamic
+        onClick={async () => {
+          await connect();
+          window.localStorage.setItem(
+            "wallet_address",
+            publicKey?.toBase58() as string
+          );
+        }}
         style={{
           backgroundColor: "#2596be",
           marginRight: 10,
@@ -34,7 +42,14 @@ export const ConnectWallet = () => {
           marginBottom: isMobile ? 10 : 0,
         }}
       />
-      <WalletDisconnectButtonDynamic style={{ borderRadius: 50 }} />
+      <WalletDisconnectButtonDynamic
+        style={{ borderRadius: 50 }}
+        onClick={async () => {
+          await disconnect();
+          localStorage.removeItem("wallet_address");
+          window.location.reload();
+        }}
+      />
     </Flex>
   );
 };

@@ -11,12 +11,15 @@ import { useEffect, useState } from "react";
 import { ConnectWallet } from "./ConnectWallet";
 import { getUserInfo } from "../utils/functions/getUserInfo";
 import { User } from "../utils/types/userType";
+import { useRouter } from "next/router";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export const AffiliateComponent = () => {
   const [isMobile] = useMediaQuery("(max-width: 1200px)");
   const [walletAddress, setWalletAddress] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [userInfo, setUserInfo] = useState<User | null>(null);
+  const { connecting } = useWallet();
   const { onCopy } = useClipboard(
     `${process.env.NEXT_PUBLIC_APP_URL}/ref/${userInfo?.address}`
   );
@@ -25,13 +28,10 @@ export const AffiliateComponent = () => {
     if (typeof window !== "undefined") {
       setWalletAddress(localStorage.getItem("wallet_address") || "");
     }
-  }, []);
+  }, [connecting]);
 
   useEffect(() => {
-    if (walletAddress) {
-      setLoading(true);
-      getUserInfo(walletAddress, setUserInfo, setLoading);
-    }
+    getUserInfo(walletAddress, setUserInfo, setLoading);
   }, [walletAddress]);
 
   return (
@@ -41,7 +41,7 @@ export const AffiliateComponent = () => {
       bgColor="#fff"
       width={isMobile ? "95%" : "50%"}
       borderRadius={20}
-      p={isMobile ? 5 : 20}
+      p={isMobile ? 5 : 10}
       alignItems="center"
       fontFamily={"arial"}
     >
@@ -108,7 +108,10 @@ export const AffiliateComponent = () => {
                 Generated tokens
               </Text>
               <Text fontSize={isMobile ? 19 : 23} fontWeight="bold">
-                {userInfo.tokens} $DINO
+                {userInfo.tokens.toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                })}{" "}
+                DINO
               </Text>
             </Flex>
           </Flex>

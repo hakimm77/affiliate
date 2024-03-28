@@ -9,7 +9,7 @@ const BuyAffiliate = () => {
   return (
     <Flex flexDir="column" alignItems="center">
       <Head>
-        <title>Buy $DINO</title>
+        <title>Buy DINO</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link
